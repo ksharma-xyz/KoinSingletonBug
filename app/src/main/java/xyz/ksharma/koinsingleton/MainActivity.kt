@@ -4,64 +4,47 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.KoinApplication
-import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.koinConfiguration
-import org.koin.dsl.module
+import dagger.hilt.android.AndroidEntryPoint
 import xyz.ksharma.koinsingleton.ui.theme.KoinSingletonBugTheme
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
-
-            KoinApplication(application = koinConfig) {
-                KoinSingletonBugTheme {
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        NavHost(
-                            navController = navController,
-                            startDestination = HomeRoute,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding)
-                        ) {
-                            composable<HomeRoute> {
-                                val viewmodel = koinViewModel<HomeViewModel>()
-                                HomeScreen(navController)
-                            }
-                            composable<DetailRoute> {
-                                val viewmodel = koinViewModel<DetailViewModel>()
-                                DetailScreen(navController)
-                            }
+            KoinSingletonBugTheme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = HomeRoute,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    ) {
+                        composable<HomeRoute> {
+                            val viewmodel by viewModels<HomeViewModel>()
+                            LaunchedEffect(Unit) { viewmodel.doWork() }
+                            HomeScreen(navController)
+                        }
+                        composable<DetailRoute> {
+                            val viewmodel by viewModels<DetailViewModel>()
+                            LaunchedEffect(Unit) { viewmodel.doWork() }
+                            DetailScreen(navController)
                         }
                     }
                 }
             }
         }
     }
-}
-
-val koinConfig = koinConfiguration {
-    modules(
-        repoModule,
-        viewModelsModule,
-    )
-    androidContext(MainApplication.instance ?: error("No Android application context set"))
-}
-
-val viewModelsModule = module {
-    viewModelOf(::HomeViewModel)
-    viewModelOf(::DetailViewModel)
 }

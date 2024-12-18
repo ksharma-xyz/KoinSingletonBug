@@ -1,23 +1,21 @@
 package xyz.ksharma.koinsingleton
 
 import android.util.Log
-import org.koin.dsl.module
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface Repository {
-    fun doWork()
+    fun doWork(screenName: String)
 }
 
-class RealRepository : Repository {
+@Singleton
+class RealRepository @Inject constructor() : Repository {
 
     init {
         Log.d("RealRepository", "instance: $this")
     }
 
-    override fun doWork() {
-        Log.d("RealRepository", "Doing work")
+    override fun doWork(screenName: String) {
+        Log.d("RealRepository", "$this is doing work for $screenName")
     }
-}
-
-val repoModule = module {
-    single<Repository> { RealRepository() }
 }

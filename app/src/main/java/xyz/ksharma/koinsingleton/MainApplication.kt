@@ -1,15 +1,7 @@
 package xyz.ksharma.koinsingleton
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 
-class MainApplication : Application() {
-
-    override fun onCreate() {
-        super.onCreate()
-        instance = this
-    }
-
-    companion object {
-        var instance: Application? = null
-    }
-}
+@HiltAndroidApp
+class MainApplication : Application()
