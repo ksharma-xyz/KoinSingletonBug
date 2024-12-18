@@ -7,22 +7,45 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.koinConfiguration
+import org.koin.dsl.module
 import xyz.ksharma.koinsingleton.ui.theme.KoinSingletonBugTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
+
             KoinApplication(application = koinConfig) {
                 KoinSingletonBugTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        Text(text = "Hello World!", modifier = Modifier.padding(innerPadding))
+                        NavHost(
+                            navController = navController,
+                            startDestination = HomeRoute,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        ) {
+                            composable<HomeRoute> {
+                                val viewmodel = koinViewModel<HomeViewModel>()
+                                HomeScreen(navController)
+                            }
+                            composable<DetailRoute> {
+                                val viewmodel = koinViewModel<DetailViewModel>()
+                                DetailScreen(navController)
+                            }
+                        }
                     }
                 }
             }
@@ -31,6 +54,14 @@ class MainActivity : ComponentActivity() {
 }
 
 val koinConfig = koinConfiguration {
-    modules(repoModule)
+    modules(
+        repoModule,
+        viewModelsModule,
+    )
     androidContext(MainApplication.instance ?: error("No Android application context set"))
+}
+
+val viewModelsModule = module {
+    viewModelOf(::HomeViewModel)
+    viewModelOf(::DetailViewModel)
 }
