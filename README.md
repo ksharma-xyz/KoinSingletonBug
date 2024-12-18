@@ -1,5 +1,7 @@
 # Koin Singleton Bug Sample Project
 
+https://github.com/InsertKoinIO/koin/issues/2078
+
 In Hilt, if we mark a class as Singleton, then the instance remains the same as long as the app process is active. It should be the same for Koin too. If a configuration change happens, then a new object should not be created.  
 
 
