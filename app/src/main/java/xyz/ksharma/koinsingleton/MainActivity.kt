@@ -11,14 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.KoinApplication
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.koinConfiguration
 import org.koin.dsl.module
 import xyz.ksharma.koinsingleton.ui.theme.KoinSingletonBugTheme
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-            KoinApplication(application = koinConfig) {
+            KoinAndroidContext {
                 KoinSingletonBugTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                         NavHost(
@@ -51,14 +48,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-val koinConfig = koinConfiguration {
-    modules(
-        repoModule,
-        viewModelsModule,
-    )
-    androidContext(MainApplication.instance ?: error("No Android application context set"))
 }
 
 val viewModelsModule = module {
